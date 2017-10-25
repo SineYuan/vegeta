@@ -124,15 +124,19 @@ func attack(opts *attackOpts) (err error) {
 		return err
 	}
 
-	atk := vegeta.NewAttacker(
+	h := vegeta.NewHttpHitter(
 		vegeta.Redirects(opts.redirects),
 		vegeta.Timeout(opts.timeout),
 		vegeta.LocalAddr(*opts.laddr.IPAddr),
 		vegeta.TLSConfig(tlsc),
-		vegeta.Workers(opts.workers),
 		vegeta.KeepAlive(opts.keepalive),
 		vegeta.Connections(opts.connections),
 		vegeta.HTTP2(opts.http2),
+	)
+
+	atk := vegeta.NewAttacker(
+		h,
+		vegeta.Workers(opts.workers),
 	)
 
 	res := atk.Attack(tr, opts.rate, opts.duration)
