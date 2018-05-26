@@ -1,17 +1,15 @@
 package vegeta
 
 import (
-	"time"
-	"net"
-	"net/http"
+	"io"
 	"fmt"
+	"net"
+	"time"
+	"net/http"
+	"io/ioutil"
 	"crypto/tls"
 
 	"golang.org/x/net/http2"
-
-	"io"
-	"io/ioutil"
-	"github.com/k0kubun/pp"
 )
 
 type Hitter interface {
@@ -33,8 +31,8 @@ func NewHttpHitter(opts ...func(*HttpHitter)) *HttpHitter {
 	}
 	a.client = http.Client{
 		Transport: &http.Transport{
-			Proxy: http.ProxyFromEnvironment,
-			Dial:  a.dialer.Dial,
+			Proxy:                 http.ProxyFromEnvironment,
+			Dial:                  a.dialer.Dial,
 			ResponseHeaderTimeout: DefaultTimeout,
 			TLSClientConfig:       DefaultTLSConfig,
 			TLSHandshakeTimeout:   10 * time.Second,
@@ -131,7 +129,7 @@ func HTTP2(enabled bool) func(*HttpHitter) {
 	}
 }
 
-func (a *HttpHitter) Hit(tr Targeter, tm time.Time) (res *Result, stop bool)  {
+func (a *HttpHitter) Hit(tr Targeter, tm time.Time) (res *Result, stop bool) {
 	var (
 		tgt Target
 		err error
@@ -146,7 +144,6 @@ func (a *HttpHitter) Hit(tr Targeter, tm time.Time) (res *Result, stop bool)  {
 	}()
 
 	if err = tr(&tgt); err != nil {
-		pp.Println(err)
 		return res, true
 	}
 
